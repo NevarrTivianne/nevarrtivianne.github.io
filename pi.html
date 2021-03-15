@@ -10,22 +10,47 @@ textarea {
  height: 400px;
 }
 textarea.paste {
- width: 200px;
- height: 30px;
+ width: 460px;
+ height: 120px;
 }
 #import {
 
 }
+.example {
+  width: 460px;
+  text-align: left;
+}
+#single-planets {
+  display: none;
+}
 </style>
-</head><body><div align="center" style="padding-top: 20px;">
+</head><body>
+  <h1>EVE Planetary Interaction untangler</h1>
+  <div align="center" style="padding-top: 20px;">
 <div>
+  <p>
+    Example input:<br>
+    <div class="example">
+      <strong>1b al 20 HM 40 bM 30</strong><br>
+      1 = Planet 1<br>
+      b = Barren<br>
+      al = Aqueous Liquids<br>
+      20 = 20% according to Agency or scanning<br>
+      HM = Heavy Metals<br>
+      ...
+    </div>
+  </p>
 <p>
-<textarea type="text" class="paste" value=""></textarea>
-<input type="button" id="import" value="import" /><br />
+<textarea type="text" class="paste" value=""></textarea><br>
 </p>
+<p>
+<input type="button" id="import" value="import" />
+</p>
+
+<div id="single-planets">
+<!--<input type="text" class="search" value="HM 72	NC 67	FM 49	SP 40" /><br />-->
 <input type="text" class="type" value="" />
 <input type="text" class="name" value="I" />
-<!--<input type="text" class="search" value="HM 72	NC 67	FM 49	SP 40" /><br />-->
 <input type="text" class="search" value="" /><br />
 <input type="text" class="type" value="" />
 <input type="text" class="name" value="II" />
@@ -66,11 +91,13 @@ textarea.paste {
 <p>
 <input type="button" id="go" value="go" /><br />
 </p>
+</div>
 
 <p>
 <textarea id="output"></textarea>
 </p>
 <!--<input type="button" id="reset" value="reset" />-->
+</div>
 <script src="zepto.min.js"></script>
 <script type="text/javascript">
 const num_planets = 13;
@@ -208,8 +235,9 @@ p4['Wetware Mainframe'] = ['Supercomputers', 'Biotech Research Reports', 'Cryopr
 
 // the import button
 $('#import').on('click', function(e){
-  var val = $('.paste').val();
+  var val = $('.paste').val().trim();
   if (val.length < 1) return;
+  $("#single-planets").show();
 
   $.each($('.search'), function (k, v) {
     $('.search')[k].value = "";
@@ -223,7 +251,7 @@ $('#import').on('click', function(e){
     if (m.length == 5) {
       var idx = parseInt(m[1]);
       var ptype = m[3].toUpperCase();
-      var text = m[4];
+      var text = m[4].toUpperCase();
       $('.search')[idx-1].value = text;
       $('.type')[idx-1].value = ptypes[ptype];
     }
@@ -367,4 +395,4 @@ $.each(match3_m, function(k, v) {
   }
 });
 </script>
-</div></body></html>
+</body></html>
