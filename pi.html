@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html><head>
+<title>PI</title>
+<style>
+input[type=text] { width: 300px; }
+input[type=text].name { width: 50px; }
+input[type=text].type { width: 70px; }
+textarea {
+ width: 80%;
+ height: 400px;
+}
+textarea.paste {
+ width: 200px;
+ height: 30px;
+}
+#import {
+
+}
+</style>
+</head><body><div align="center" style="padding-top: 20px;">
+<div>
+<p>
+<textarea type="text" class="paste" value=""></textarea>
+<input type="button" id="import" value="import" /><br />
+</p>
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="I" />
+<!--<input type="text" class="search" value="HM 72	NC 67	FM 49	SP 40" /><br />-->
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="II" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="III" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="IV" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="V" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="VI" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="VII" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="VIII" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="IX" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="X" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="XI" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="XII" />
+<input type="text" class="search" value="" /><br />
+<input type="text" class="type" value="" />
+<input type="text" class="name" value="XIII" />
+<input type="text" class="search" value="" /><br />
+<p>
+<input type="button" id="go" value="go" /><br />
+</p>
+
+<p>
+<textarea id="output"></textarea>
+</p>
+<!--<input type="button" id="reset" value="reset" />-->
+<script src="zepto.min.js"></script>
+<script type="text/javascript">
+const num_planets = 13;
+
+function out0(sel, text) {
+  var old = $(sel).val();
+  $(sel).text(old + text);
+}
+function out(text) {
+  out0('#output', text + "\n");
+}
+
+
+// set up stuff for lookup and data
+var ps = [];
+var p0 = {};
+var p1 = {};
+var p2 = {};
+var p3 = {};
+var p4 = {};
+
+var ptypes = {};
+ptypes['B'] = 'Barren';
+ptypes['G'] = 'Gas';
+ptypes['I'] = 'Ice';
+ptypes['L'] = 'Lava';
+ptypes['O'] = 'Oceanic';
+ptypes['P'] = 'Plasma';
+ptypes['S'] = 'Storm';
+ptypes['T'] = 'Temperate';
+
+ps[0] = 'AL';
+ps[1] = 'AU';
+ps[2] = 'BM';
+ps[3] = 'CC';
+ps[4] = 'CO';
+ps[5] = 'FM';
+ps[6] = 'HM';
+ps[7] = 'IS';
+ps[8] = 'MO';
+ps[9] = 'NG';
+ps[10] = 'NM';
+ps[11] = 'NC';
+ps[12] = 'PO';
+ps[13] = 'RG';
+ps[14] = 'SP';
+
+p0[0] = 'Aqueous Liquids';
+p0[1] = 'Autotrophs';
+p0[2] = 'Base Metals';
+p0[3] = 'Carbon Compounds';
+p0[4] = 'Complex Organisms';
+p0[5] = 'Felsic Magma';
+p0[6] = 'Heavy Metals';
+p0[7] = 'Ionic Solutions';
+p0[8] = 'Micro Organisms';
+p0[9] = 'Noble Gas';
+p0[10] = 'Noble Metals';
+p0[11] = 'Non-CS Crystals';
+p0[12] = 'Planktic Colonies';
+p0[13] = 'Reactive Gas';
+p0[14] = 'Suspended Plasma';
+
+p1['Aqueous Liquids'] = 'Water';
+p1['Autotrophs'] = 'Industrial Fibers';
+p1['Base Metals'] = 'Reactive Metals';
+p1['Carbon Compounds'] = 'Biofuels';
+p1['Complex Organisms'] = 'Proteins';
+p1['Felsic Magma'] = 'Silicon';
+p1['Heavy Metals'] = 'Toxic Metals';
+p1['Ionic Solutions'] = 'Electrolytes';
+p1['Micro Organisms'] = 'Bacteria';
+p1['Noble Gas'] = 'Oxygen';
+p1['Noble Metals'] = 'Precious Metals';
+p1['Non-CS Crystals'] = 'Chiral Structures';
+p1['Planktic Colonies'] = 'Biomass';
+p1['Reactive Gas'] = 'Oxidizing Compound';
+p1['Suspended Plasma'] = 'Plasmoids';
+
+p2['Biocells'] = ['Biofuels', 'Precious Metals'];
+p2['Construction Blocks'] = ['Reactive Metals', 'Toxic Metals'];
+p2['Consumer Electronics'] = ['Chiral Structures', 'Toxic Metals'];
+p2['Coolant'] = ['Electrolytes', 'Water'];
+p2['Enriched Uranium'] = ['Precious Metals', 'Toxic Metals'];
+p2['Fertilizer'] = ['Bacteria', 'Proteins'];
+p2['Genetically Enhanced Livestock'] = ['Biomass', 'Proteins'];
+p2['Livestock'] = ['Biofuels', 'Proteins'];
+p2['Mechanical Parts'] = ['Precious Metals', 'Reactive Metals'];
+p2['Miniature Electronics'] = ['Chiral Structures', 'Silicon'];
+p2['Microfiber Shielding'] = ['Industrial Fibers', 'Silicon'];
+p2['Nanites'] = ['Bacteria', 'Reactive Metals'];
+p2['Oxides'] = ['Oxidizing Compound', 'Oxygen'];
+p2['Polyaramids'] = ['Industrial Fibers', 'Oxidizing Compund'];
+p2['Polytextiles'] = ['Biofuels', 'Industrial Fibers'];
+p2['Rocket Fuel'] = ['Electrolytes', 'Plasmoids'];
+p2['Silicate Glass'] = ['Oxidizing Compund', 'Silicon'];
+p2['Superconductors'] = ['Plasmoids', 'Water'];
+p2['Supertensile Plastics'] = ['Biomass', 'Oxygen'];
+p2['Synthetic Oil'] = ['Electrolytes', 'Oxygen'];
+p2['Test Cultures'] = ['Bacteria', 'Water'];
+p2['Transmitter'] = ['Chiral Structures', 'Plasmoids'];
+p2['Viral Agent'] = ['Bacteria', 'Biomass'];
+p2['Water-Cooled CPU'] = ['Reactive Metals', 'Water'];
+
+p3['Biotech Research Reports'] = ['Nanites', 'Livestock', 'Construction Blocks'];
+p3['Camera Drones'] = ['Silicate Glass', 'Rocket Fuel'];
+p3['Condensates'] = ['Oxides', 'Coolant'];
+p3['Cryoprotectant Solution'] = ['Test Cultures', 'Synthetic Oil', 'Fertilizer'];
+p3['Data Chips'] = ['Supertensile Plastics', 'Microfiber Shielding'];
+p3['Gel-Matrix Biopaste'] = ['Oxides', 'Biocells', 'Superconductors'];
+p3['Guidance Systems'] = ['Water-Cooled CPU', 'Transmitter'];
+p3['Hazmat Detection Systems'] = ['Polytextiles', 'Viral Agent', 'Transmitter'];
+p3['Hermetic Membranes'] = ['Polyaramids', 'Genetically Enhanced Livestock'];
+p3['High-Tech Transmitters'] = ['Polyaramids', 'Transmitter'];
+p3['Industrial Explosives'] = ['Fertilizer', 'Polytextiles'];
+p3['Neocoms'] = ['Biocells', 'Silicate Glass'];
+p3['Nuclear Reactors'] = ['Microfiber Shielding', 'Enriched Uranium'];
+p3['Planetary Vehicles'] = ['Supertensile Plastics', 'Mechanical Parts', 'Miniature Electronics'];
+p3['Robotics'] = ['Mechanical Parts', 'Consumer Electronics'];
+p3['Smartfab Units'] = ['Construction Blocks', 'Miniature Electronics'];
+p3['Supercomputers'] = ['Water-Cooled CPU', 'Coolant', 'Consumer Electronics'];
+p3['Synthetic Synapses'] = ['Supertensile Plastics', 'Test Cultures'];
+p3['Transcranial Microcontroller'] = ['Biocells', 'Nanites'];
+p3['Ukomi Super Conductor'] = ['Synthetic Oil', 'Superconductors'];
+p3['Vaccines'] = ['Livestock', 'Viral Agent'];
+
+p4['Broadcast Node'] = ['Neocoms', 'Data Chips', 'High-Tech Transmitters'];
+p4['Integrity Response Drones'] = ['Gel-Matrix Biopaste', 'Hazmat Detection Systems', 'Planetary Vehicles'];
+p4['Nano-Factory'] = ['Industrial Explosives', 'Ukomi Super Conductors', '40 Reactive Metals'];
+p4['Organic Mortar Applicators'] = ['Condensates', 'Robotics', '40 Bacteria'];
+p4['Recursive Computing Module'] = ['Synthetic Synapses', 'Guidance Systems', 'Transcranial Microcontrollers'];
+p4['Self-Harmonizing Power Core'] = ['Camera Drones', 'Nuclear Reactors', 'Hermetic Membranes'];
+p4['Sterile Conduits'] = ['40 Water', 'Smartfab Units', 'Vaccines'];
+p4['Wetware Mainframe'] = ['Supercomputers', 'Biotech Research Reports', 'Cryoprotectant Solution'];
+
+// the import button
+$('#import').on('click', function(e){
+  var val = $('.paste').val();
+  if (val.length < 1) return;
+
+  $.each($('.search'), function (k, v) {
+    $('.search')[k].value = "";
+  });
+  var lines = val.split("\n");
+  //console.log(lines);
+  var re = /(\d+)(\s*([bgilopst])\s+)(.+)/i;
+  $.each(lines, function(k, v) {
+    var m = v.match(re);
+    //console.log(m);
+    if (m.length == 5) {
+      var idx = parseInt(m[1]);
+      var ptype = m[3].toUpperCase();
+      var text = m[4];
+      $('.search')[idx-1].value = text;
+      $('.type')[idx-1].value = ptypes[ptype];
+    }
+  });
+});
+
+
+// the actual calculation
+$('#go').on('click', function(e){
+  for (var planet=1; planet <= num_planets; ++planet) {
+
+// read inputs and parse
+var val = $('.search')[planet-1].value.toUpperCase();
+if (val.length <1) continue;
+var name = $('.name')[planet-1].value;
+var r0 = [];
+var r1 = [];
+var amounts0 = {};
+var amounts1 = {};
+
+for (var i=0; i<ps.length; i++) {
+  let re = new RegExp("(" + ps[i] + ")\\s+(\\w+)");
+  let found = val.match(re);
+  if (found && found.length > 0) {
+  //console.log(re, val);
+  //console.log(found);
+  p0x = p0[i];
+  amounts0[p0x] = found[2];
+  amounts1[p1[p0x]] = found[2];
+  r0.push(p0x);
+  r1.push(p1[p0x]);
+  }
+}
+
+// generate output
+console.log("================== Planet " + name + " ================");
+out("================== Planet " + name + " ================");
+//console.log(r0);
+//console.log(amounts0);
+//console.log(amounts1);
+//console.log(r1);
+
+var match1 = [];
+var match2 = [];
+var match3 = [];
+var match3_m = [];
+
+// see if we have all needed P1 materials per P2
+$.each(p2, function(k, v) {
+  var ok = [];
+  $.each(p2[k], function(k2, v2) {
+    if ($.inArray(v2, r1) > -1)  {
+      ok.push(k);
+    }
+  });
+  if (ok.length == 2) match2.push(k);
+  else if (ok.length == 1) match1.push(k);
+});
+
+//console.log("p2 2 = ", match2);
+//console.log("p2 1 = ", match1);
+
+// show 2/2 P2 and calculate average
+$.each(match2, function(k, v) {
+  //console.log("P2 (2/2): " + v);
+  out("P2 (2/2): " + v);
+  var avg = 0;
+  $.each(p2[v], function(k2, v2) {
+    //console.log("  " + v2 + " :: " + amounts1[v2]);
+    out("  " + v2 + " :: " + amounts1[v2]);
+    avg = avg + parseInt(amounts1[v2]);
+  });
+  //console.log(avg/2);
+  out("Average: " + (avg/2));
+  out("");
+});
+
+// show 1/2 P2
+if (match1.length > 0) out("-------");
+$.each(match1, function(k, v) {
+  //console.log("P2 (1/2): " + v);
+  out("P2 (1/2): " + v);
+  $.each(p2[v], function(k2, v2) {
+    if (amounts1[v2] !== undefined) {
+      //console.log("  " + v2 + " :: " + amounts1[v2]);
+      out("  " + v2 + " :: " + amounts1[v2]);
+    } else {
+      //console.log("  " + v2 + " :: 0");
+      out("  " + v2 + " :: 0");
+    }
+  });
+});
+
+
+// calculate P3
+
+$.each(p3, function (k, v) {
+  var ok = [];
+  $.each(p3[k], function(k2, v2) {
+    if ($.inArray(v2, match2) > -1) {
+      ok.push(k);
+    }
+  });
+  if (ok.length == p3[k].length) match3.push(k);
+  else if (ok.length > 0) match3_m.push(k);
+});
+
+console.log("m2 ", match2);
+console.log("m3 ", match3);
+console.log("m3m", match3_m);
+
+// show (unlikely) 2/2 and 3/3 P3 and calculate average
+if (match3.length > 0) out("-------");
+$.each(match3, function(k, v) {
+  out("P3 (2/2): " + v);
+  var avg = 0;
+  $.each(p3[v], function(k2, v2) {
+    //console.log("  " + v2 + " :: " + amounts1[v2]);
+    out("  " + v2 + " " );
+    //avg = avg + parseInt(amounts1[v2]);
+  });
+  //console.log(avg/2);
+  //out("Average: " + (avg/2));
+  out("");
+});
+
+// show 1/2 P3
+if (match3_m.length > 0) out("-------");
+$.each(match3_m, function(k, v) {
+  out("P3 (1/x): " + v);
+  $.each(p3[v], function(k2, v2) {
+  console.log("x " + k2 + " " +v2);
+    if ($.inArray(v2, match2)) {
+      out("  " + v2 + " :: 1");
+    } else {
+      out("  " + v2 + " :: 0");
+    }
+  });
+});
+
+  }
+});
+</script>
+</div></body></html>
