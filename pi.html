@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html><head>
-<title>PI</title>
+<html lang="en"><head>
+<title>PI untangler</title>
+<meta charset="utf-8"/>
 <style>
 input[type=text] { width: 300px; }
 input[type=text].name { width: 50px; }
@@ -13,94 +14,78 @@ textarea.paste {
  width: 460px;
  height: 120px;
 }
-#import {
-
+.viewport {
+  text-align: center;
+  padding-top: 10px;
+}
+#go {
+  background-color: greenyellow;
+}
+.example-container {
+  width: 460px;
+  margin: auto;
 }
 .example {
   width: 460px;
   text-align: left;
+  background-color: #eeeeee;
+  margin: auto;
 }
-#single-planets {
+#single-planets-container {
   display: none;
 }
 </style>
-</head><body>
+</head>
+<body>
+  <div class="viewport">
   <h1>EVE Planetary Interaction untangler</h1>
-  <div align="center" style="padding-top: 20px;">
+  
+<div class="example-container">
+  <h2>Example input</h2>
+  <div class="example">
+    <strong>1b al 20 HM 40&#9;bM30</strong><br>
+    1 = Planet 1<br>
+    b = Barren<br>
+    al = Aqueous Liquids<br>
+    20 = 20% according to Agency or scanning<br>
+    HM = Heavy Metals<br>
+    ...
+  </div>
+</div>
+
 <div>
+  <h2>Paste your survey here</h2>
+  <textarea type="text" class="paste" value=""></textarea><br>
   <p>
-    Example input:<br>
-    <div class="example">
-      <strong>1b al 20 HM 40 bM 30</strong><br>
-      1 = Planet 1<br>
-      b = Barren<br>
-      al = Aqueous Liquids<br>
-      20 = 20% according to Agency or scanning<br>
-      HM = Heavy Metals<br>
-      ...
-    </div>
+    <input type="button" id="import" value="import" />
   </p>
-<p>
-<textarea type="text" class="paste" value=""></textarea><br>
-</p>
-<p>
-<input type="button" id="import" value="import" />
-</p>
-
-<div id="single-planets">
-<!--<input type="text" class="search" value="HM 72	NC 67	FM 49	SP 40" /><br />-->
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="I" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="II" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="III" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="IV" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="V" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="VI" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="VII" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="VIII" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="IX" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="X" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="XI" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="XII" />
-<input type="text" class="search" value="" /><br />
-<input type="text" class="type" value="" />
-<input type="text" class="name" value="XIII" />
-<input type="text" class="search" value="" /><br />
-<p>
-<input type="button" id="go" value="go" /><br />
-</p>
+  <hr>
 </div>
 
-<p>
+<div id="single-planets-container">
+  <h2>Breakdown</h2>
+  <div id="single-planets"></div>
+  <p>
+    <input type="button" id="go" value="go" /><br />
+  </p>
+  <hr>
+</div>
+
+<div>
 <textarea id="output"></textarea>
-</p>
-<!--<input type="button" id="reset" value="reset" />-->
 </div>
+
+<!--<input type="button" id="reset" value="reset" />-->
+
+  </div>
 <script src="zepto.min.js"></script>
 <script type="text/javascript">
-const num_planets = 13;
+var roman = [
+  "0", "I", "II", "III", "IV", "IV", "V",
+  "VI", "VII", "VIII", "IX", "X",
+  "XI", "XII", "XIII", "XIV", "XV"
+];
+var planets = [];
 
 function out0(sel, text) {
   var old = $(sel).val();
@@ -109,7 +94,6 @@ function out0(sel, text) {
 function out(text) {
   out0('#output', text + "\n");
 }
-
 
 // set up stuff for lookup and data
 var ps = [];
@@ -237,7 +221,9 @@ p4['Wetware Mainframe'] = ['Supercomputers', 'Biotech Research Reports', 'Cryopr
 $('#import').on('click', function(e){
   var val = $('.paste').val().trim();
   if (val.length < 1) return;
-  $("#single-planets").show();
+  planets = [];
+  $("#single-planets").empty();
+  $("#single-planets-container").show();
 
   $.each($('.search'), function (k, v) {
     $('.search')[k].value = "";
@@ -251,29 +237,36 @@ $('#import').on('click', function(e){
     if (m.length == 5) {
       var idx = parseInt(m[1]);
       var ptype = m[3].toUpperCase();
-      var text = m[4].toUpperCase();
-      $('.search')[idx-1].value = text;
-      $('.type')[idx-1].value = ptypes[ptype];
+      var text = m[4].toUpperCase().replace(/(\s+)/g, ' ');
+
+      var p = {idx: idx, type: ptypes[ptype], value: text, name: roman[idx]};
+      planets.push(p);
+      var row = '<div>'
+        + '<input type="text" class="name" disabled="disabled" value="'+p.name+'" />'
+        + '<input type="text" class="type" disabled="disabled" value="'+p.type+'" />'
+        + '<input type="text" class="search" disabled="disabled" value="'+p.value+'" /></div>';
+      $("#single-planets").append(row);
     }
   });
+  //console.log(planets);
 });
 
 
 // the actual calculation
 $('#go').on('click', function(e){
-  for (var planet=1; planet <= num_planets; ++planet) {
+  for (var ip=0; ip<planets.length; ++ip) {
 
 // read inputs and parse
-var val = $('.search')[planet-1].value.toUpperCase();
+var val = planets[ip].value;
 if (val.length <1) continue;
-var name = $('.name')[planet-1].value;
+var name = planets[ip].name;
 var r0 = [];
 var r1 = [];
 var amounts0 = {};
 var amounts1 = {};
 
 for (var i=0; i<ps.length; i++) {
-  let re = new RegExp("(" + ps[i] + ")\\s+(\\w+)");
+  let re = new RegExp("(" + ps[i] + ")\\s*(\\w+)");
   let found = val.match(re);
   if (found && found.length > 0) {
   //console.log(re, val);
