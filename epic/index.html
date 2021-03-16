@@ -11,8 +11,7 @@ textarea {
  height: 400px;
 }
 textarea.paste {
- width: 460px;
- height: 120px;
+  height: 120px;
 }
 .viewport {
   text-align: center;
@@ -21,41 +20,60 @@ textarea.paste {
 #go {
   background-color: greenyellow;
 }
-.example-container {
+.mid-sized {
   width: 460px;
   margin: auto;
 }
-.example {
+.example, .todos {
   width: 460px;
   text-align: left;
-  background-color: #eeeeee;
   margin: auto;
+}
+.bg-grey {
+  background-color: #eeeeee;
 }
 #single-planets-container {
   display: none;
 }
 </style>
 </head>
-<body>
-  <div class="viewport">
-  <h1>EVE Planetary Interaction Chart</h1>
-  
-<div class="example-container">
-  <h2>Example input</h2>
-  <div class="example">
-    <strong>1b al 20 HM 40&#9;bM30</strong><br>
-    1 = Planet 1<br>
+<body><div class="viewport">
+
+<h1>EVE Planetary Interaction Chart</h1>
+<div>
+  <p>
+  When deciding where set up my PI in a constellation I wanted<br>
+  to choose a semi-good setup of what P1 and P2 to setup and<br>
+  minimize shuttling P1 from planet to planet.<br>
+  This tool will recommend what P2/P3 you can produce on a single planet.<br>
+  </p>
+  <p>
+  To get the input, go to the Agency window ingame,<br>
+  then Planetary Interaction and write down the percentages.
+  </p>
+</div>
+
+<div class="mid-sized">
+  <h2>Example input notation</h2>
+  <div class="example bg-grey">
+    <p>
+    <strong>1G AL 59	IS 57	RG 30	BM 62	NG 66</strong><br>
+    <strong>2b al 20 hm 40&#9;bm30</strong><br>
+    </p>
+    2 = Planet 2<br>
     b = Barren<br>
     al = Aqueous Liquids<br>
     20 = 20% according to Agency or scanning<br>
     HM = Heavy Metals<br>
+    BM = Base Metals<br>
     ...
+    (all case insensitive)
   </div>
 </div>
 
 <div>
   <h2>Paste your survey here</h2>
-  <textarea type="text" class="paste" value=""></textarea><br>
+  <textarea type="text" class="paste mid-sized" value=""></textarea><br>
   <p>
     <input type="button" id="import" value="import" />
   </p>
@@ -76,6 +94,20 @@ textarea.paste {
 </div>
 
 <!--<input type="button" id="reset" value="reset" />-->
+<h2>Changes, TODOs, etc</h2>
+
+<div class="todos">
+<ul>
+  <li>2021-03-17: added intro, changes, todos</li>
+  <li>2021-03-16: revamped layout, added examples</li>
+  <li>2020-05: first version</li>
+</ul>
+
+<ul>
+  <li>TODO: clarify P3 output on single planet</li>
+  <li>TODO: allow cross-planet calculations</li>
+</ul>
+</div>
 
   </div>
 <script src="../zepto.min.js"></script>
@@ -219,19 +251,17 @@ p4['Wetware Mainframe'] = ['Supercomputers', 'Biotech Research Reports', 'Cryopr
 
 // the import button
 $('#import').on('click', function(e){
-  var val = $('.paste').val().trim();
-  if (val.length < 1) return;
+  var pasted = $('.paste').val().trim();
+  if (pasted.length < 1) return;
   planets = [];
   $("#single-planets").empty();
   $("#single-planets-container").show();
 
-  $.each($('.search'), function (k, v) {
-    $('.search')[k].value = "";
-  });
-  var lines = val.split("\n");
-  //console.log(lines);
+  var lines = pasted.split("\n");
   var re = /(\d+)(\s*([bgilopst])\s+)(.+)/i;
   $.each(lines, function(k, v) {
+    v = v.trim();
+    if (v.length < 1 || v.substring(0, 1) == '#') return;
     var m = v.match(re);
     //console.log(m);
     if (m.length == 5) {
@@ -254,6 +284,7 @@ $('#import').on('click', function(e){
 
 // the actual calculation
 $('#go').on('click', function(e){
+  $("#output").empty();
   for (var ip=0; ip<planets.length; ++ip) {
 
 // read inputs and parse
@@ -280,8 +311,10 @@ for (var i=0; i<ps.length; i++) {
 }
 
 // generate output
+if (ip > 0) out("");
 console.log("================== Planet " + name + " ================");
 out("================== Planet " + name + " ================");
+out("");
 //console.log(r0);
 //console.log(amounts0);
 //console.log(amounts1);
@@ -319,11 +352,10 @@ $.each(match2, function(k, v) {
   });
   //console.log(avg/2);
   out("Average: " + (avg/2));
-  out("");
 });
 
 // show 1/2 P2
-if (match1.length > 0) out("-------");
+if (match1.length > 0) out("\n-------\n");
 $.each(match1, function(k, v) {
   //console.log("P2 (1/2): " + v);
   out("P2 (1/2): " + v);
@@ -357,7 +389,7 @@ console.log("m3 ", match3);
 console.log("m3m", match3_m);
 
 // show (unlikely) 2/2 and 3/3 P3 and calculate average
-if (match3.length > 0) out("-------");
+if (match3.length > 0) out("\n-------\n");
 $.each(match3, function(k, v) {
   out("P3 (2/2): " + v);
   var avg = 0;
@@ -372,7 +404,7 @@ $.each(match3, function(k, v) {
 });
 
 // show 1/2 P3
-if (match3_m.length > 0) out("-------");
+if (match3_m.length > 0) out("\-------\n");
 $.each(match3_m, function(k, v) {
   out("P3 (1/x): " + v);
   $.each(p3[v], function(k2, v2) {
