@@ -20,6 +20,9 @@ h1, h2, h3 { padding-bottom: 5px; }
   margin: auto;
   padding: 10px;
 }
+#mats {
+  font-size: small;
+}
 .bg-grey {
   background-color: #444444;
 }
@@ -77,11 +80,8 @@ textarea {
     </p>
     2 = Planet 2<br>
     b = Barren<br>
-    al = Aqueous Liquids<br>
-    20 = 20% according to Agency or scanning<br>
-    HM = Heavy Metals<br>
-    BM = Base Metals<br>
-    ...<br>
+    20/40/30 = x% according to Agency or scanning<br>
+    <div id="mats"></div>
     (everything is case insensitive)
   </div>
 </div>
@@ -116,6 +116,7 @@ textarea {
 <h2>Changes, TODOs, etc</h2>
 <div class="todos">
 <ul>
+  <li>2021-03-21: added shortcut explanation</li>
   <li>2021-03-18: new CSS, some layout changes, split P2/P3</li>
   <li>2021-03-17: added intro, changes, todos</li>
   <li>2021-03-16: revamped layout, added examples</li>
@@ -271,6 +272,12 @@ p4['Self-Harmonizing Power Core'] = ['Camera Drones', 'Nuclear Reactors', 'Herme
 p4['Sterile Conduits'] = ['40 Water', 'Smartfab Units', 'Vaccines'];
 p4['Wetware Mainframe'] = ['Supercomputers', 'Biotech Research Reports', 'Cryoprotectant Solution'];
 
+Zepto(function($){
+for (var im=0; im<ps.length; ++im) {
+  var row = ps[im] + " = " + p0[im] + "<br>";
+  $("#mats").append(row);
+}
+});
 // the import button
 $('#import').on('click', function(e){
   var pasted = $('.paste').val().trim();
