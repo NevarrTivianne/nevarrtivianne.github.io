@@ -14,7 +14,7 @@ h1, h2, h3 { padding-bottom: 5px; }
   width: 460px;
   margin: auto;
 }
-.example, .todos {
+.example, .todos, #output-p2-summary, #output-p3-summary, #output-p3-summary-2 {
   width: 460px;
   text-align: left;
   margin: auto;
@@ -105,17 +105,27 @@ textarea {
 </div>
 
 <div id="output-container">
+  <h2>Results</h2>
   <!--<h3>P1</h3>
     <textarea id="output-p1"></textarea>-->
-  <h3>P2</h3>
-  <textarea id="output-p2"></textarea>
-  <h3>P3</h3>
+  <h3>P3 - Summary</h3>
+  <table><tr><td>
+  <div id="output-p3-summary"></div>
+  </td><td>
+  <div id="output-p3-summary-2"></div>
+  </td></tr></table>
+  <h3>P2 - Summary</h3>
+  <div id="output-p2-summary"></div>
+  <h3>P3 - Details</h3>
   <textarea id="output-p3"></textarea>
+  <h3>P2 - Details</h3>
+  <textarea id="output-p2"></textarea>
 </div>
 
 <h2>Changes, TODOs, etc</h2>
 <div class="todos">
 <ul>
+  <li>2021-04-02: added summary for P2/P3</li>
   <li>2021-03-21: added shortcut explanation</li>
   <li>2021-03-18: new CSS, some layout changes, split P2/P3</li>
   <li>2021-03-17: added intro, changes, todos</li>
@@ -301,8 +311,8 @@ $('#import').on('click', function(e){
       var p = {idx: idx, type: ptypes[ptype], value: text, name: roman[idx]};
       planets.push(p);
       var row = '<div>'
-        + '<input type="text" class="p-name" disabled="disabled" value="'+p.name+'" />'
-        + '<input type="text" class="p-type " disabled="disabled" value="'+p.type+'" />'
+        + '<input type="text" class="p-name"   disabled="disabled" value="'+p.name+'" />'
+        + '<input type="text" class="p-type "  disabled="disabled" value="'+p.type+'" />'
         + '<input type="text" class="p-search" disabled="disabled" value="'+p.value+'" /></div>';
       $("#single-planets").append(row);
     }
@@ -313,6 +323,9 @@ $('#import').on('click', function(e){
 
 // the actual calculation
 $('#go').on('click', function(e){
+  $("#output-p2-summary").empty();
+  $("#output-p3-summary").empty();
+  $("#output-p3-summary-2").empty();
   $("#output-p2").empty();
   $("#output-p3").empty();
   $("#output-container").show();
@@ -331,13 +344,11 @@ for (var i=0; i<ps.length; i++) {
   let re = new RegExp("(" + ps[i] + ")\\s*(\\w+)");
   let found = val.match(re);
   if (found && found.length > 0) {
-  //console.log(re, val);
-  //console.log(found);
-  p0x = p0[i];
-  amounts0[p0x] = found[2];
-  amounts1[p1[p0x]] = found[2];
-  r0.push(p0x);
-  r1.push(p1[p0x]);
+    p0x = p0[i];
+    amounts0[p0x] = found[2];
+    amounts1[p1[p0x]] = found[2];
+    r0.push(p0x);
+    r1.push(p1[p0x]);
   }
 }
 
@@ -346,15 +357,8 @@ if (ip > 0) {
   out2("");
   out3("");
 }
-console.log("================== Planet " + name + " ================");
-out2("================== Planet " + name + " ================");
-out2("");
-out3("================== Planet " + name + " ================");
-out3("");
-//console.log(r0);
-//console.log(amounts0);
-//console.log(amounts1);
-//console.log(r1);
+out2("================== Planet " + name + " ================\n");
+out3("================== Planet " + name + " ================\n");
 
 var match1 = [];
 var match2 = [];
@@ -373,39 +377,34 @@ $.each(p2, function(k, v) {
   else if (ok.length == 1) match1.push(k);
 });
 
-//console.log("p2 2 = ", match2);
-//console.log("p2 1 = ", match1);
-
 // show 2/2 P2 and calculate average
+var p2_summary = "";
 $.each(match2, function(k, v) {
-  //console.log("P2 (2/2): " + v);
   out2("P2 (2/2): " + v);
   var avg = 0;
   $.each(p2[v], function(k2, v2) {
-    //console.log("  " + v2 + " :: " + amounts1[v2]);
     out2("  " + v2 + " :: " + amounts1[v2]);
     avg = avg + parseInt(amounts1[v2]);
   });
-  //console.log(avg/2);
   out2("Average: " + (avg/2));
+  p2_summary += "<li>" + name + " :: " + "P2 :: " + v + ": " + (avg/2) + "</li>"
 });
+if (p2_summary != "") {
+  $("#output-p2-summary").append("<ul>" + p2_summary + "</ul>");
+}
 
 // show 1/2 P2
 if (match1.length > 0) out2("\n-------\n");
 $.each(match1, function(k, v) {
-  //console.log("P2 (1/2): " + v);
   out2("P2 (1/2): " + v);
   $.each(p2[v], function(k2, v2) {
     if (amounts1[v2] !== undefined) {
-      //console.log("  " + v2 + " :: " + amounts1[v2]);
       out2("  " + v2 + " :: " + amounts1[v2]);
     } else {
-      //console.log("  " + v2 + " :: 0");
       out2("  " + v2 + " :: 0");
     }
   });
 });
-
 
 // calculate P3
 $.each(p3, function (k, v) {
@@ -419,37 +418,47 @@ $.each(p3, function (k, v) {
   else if (ok.length > 0) match3_m.push(k);
 });
 
-console.log("m2 ", match2);
-console.log("m3 ", match3);
-console.log("m3m", match3_m);
-
 // show (unlikely) 2/2 and 3/3 P3 and calculate average
+var p3_summary = "";
 $.each(match3, function(k, v) {
+  var line = "P3 (2/2): " + v + " =<br>";
   out3("P3 (2/2): " + v);
-  var avg = 0;
   $.each(p3[v], function(k2, v2) {
-    //console.log("  " + v2 + " :: " + amounts1[v2]);
     out3("  " + v2 + " " );
-    //avg = avg + parseInt(amounts1[v2]);
   });
-  //console.log(avg/2);
-  //out3("Average: " + (avg/2));
+  line += p3[v].join(" / ");
   out3("");
+  p3_summary += "<li>" + name + " :: " + line + "" + "</li>";
 });
 
 // show 1/2 P3
 if (match3_m.length > 0 && match3.length > 0) out3("\-------\n");
+//if (match3_m.length > 0 && match3.length > 0) $("#output-p3-summary").append("<ul>");
+var p3_summary_2 = "";
+console.log(match3_m);
 $.each(match3_m, function(k, v) {
+  var line = "P3 (1/x): " + v + " =<br>";
   out3("P3 (1/x): " + v);
+  //console.log(name, v, match2);
   $.each(p3[v], function(k2, v2) {
-  console.log("x " + k2 + " " +v2);
-    if ($.inArray(v2, match2)) {
+    //console.log("x " + k2 + " " + v2);
+    if ($.inArray(v2, match2) > 0) {
       out3("  " + v2 + " :: 1");
+      line += " " + v2;
     } else {
       out3("  " + v2 + " :: 0");
     }
   });
+  //$("#output-p3-summary").append("<li>" + name + " :: " + line + "" + "</li>");
+  p3_summary_2 = "<li>" + name + " :: " + line + "" + "</li>";
 });
+//if (match3.length > 0) $("#output-p3-summary").append("</ul>");
+if (p3_summary != "") {
+  $("#output-p3-summary").append("<ul>" + p3_summary + "</ul>");
+}
+if (p3_summary_2 != "") {
+  $("#output-p3-summary-2").append("<ul>" + p3_summary_2 + "</ul>");
+}
 
   }
 });
