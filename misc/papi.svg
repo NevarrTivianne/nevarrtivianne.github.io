@@ -1,0 +1,31 @@
+<svg width="800" height="500" style="background-color: #fff" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="400" cy="250" rx="350" ry="240" stroke="black" stroke-width="1" fill="#bbb" />
+    <ellipse cx="500" cy="250" rx="250" ry="200" stroke="black" stroke-width="1" fill="#777" />
+    <circle cx="590" cy="250" r="160" stroke="black" stroke-width="1" fill="#862d86" />
+    <!--<circle cx="675" cy="250" r="75" stroke="black" stroke-width="1" fill="blue" />-->
+    <ellipse cx="675" cy="250" rx="75" ry="115" stroke="black" stroke-width="1" fill="#2a9fd6" />
+
+    <text x="650" y="170" fill="black">BRAVE</text>
+    <text x="500" y="170" fill="black">VOLTRON
+        <tspan x="500" y="210">REQ</tspan>
+        <tspan x="500" y="230">IOU</tspan>
+        <tspan x="500" y="250">W4RP</tspan>
+        <tspan x="500" y="270">FEDUP</tspan>
+        <tspan x="500" y="290">AARP.</tspan>
+        <tspan x="500" y="310">VINDI</tspan>
+        <tspan x="500" y="330">-7-</tspan>
+        <tspan x="500" y="350">-SND-</tspan>
+    </text>
+    <text x="325" y="170" fill="black">LEGACY
+        <tspan x="325" y="210">TEST</tspan>
+        <tspan x="325" y="250">(AOM)</tspan>
+    </text>
+    <text x="150" y="170" fill="black">PAPI
+        <tspan x="150" y="210">REKTD</tspan>
+        <tspan x="150" y="230">-10.0</tspan>
+        <tspan x="150" y="250">NC</tspan>
+        <tspan x="150" y="270">FRT</tspan>
+        <tspan x="150" y="290">S.R</tspan>
+        <tspan x="150" y="310">FI.RE</tspan>
+    </text>
+</svg>
