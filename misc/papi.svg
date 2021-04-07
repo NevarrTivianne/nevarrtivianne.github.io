@@ -1,9 +1,10 @@
-<svg width="800" height="500" style="background-color: #fff" xmlns="http://www.w3.org/2000/svg">
+<svg width="900" height="500" style="background-color: #fff" xmlns="http://www.w3.org/2000/svg">
     <ellipse cx="400" cy="250" rx="350" ry="240" stroke="black" stroke-width="1" fill="#bbb" />
     <ellipse cx="500" cy="250" rx="250" ry="200" stroke="black" stroke-width="1" fill="#777" />
     <circle cx="590" cy="250" r="160" stroke="black" stroke-width="1" fill="#862d86" />
     <!--<circle cx="675" cy="250" r="75" stroke="black" stroke-width="1" fill="blue" />-->
     <ellipse cx="675" cy="250" rx="75" ry="115" stroke="black" stroke-width="1" fill="#2a9fd6" />
+    <circle cx="370" cy="330" r="70" stroke="black" stroke-width="1" fill="#888" />
 
     <text x="650" y="170" fill="black">BRAVE</text>
     <text x="500" y="170" fill="black">VOLTRON
@@ -18,7 +19,10 @@
     </text>
     <text x="325" y="170" fill="black">LEGACY
         <tspan x="325" y="210">TEST</tspan>
-        <tspan x="325" y="250">(AOM)</tspan>
+        <tspan x="345" y="290">LEGACY</tspan>
+        <tspan x="345" y="310">ALLIES</tspan>
+        <tspan x="345" y="340">AOM</tspan>
+        <tspan x="345" y="360">FI.RE</tspan>
     </text>
     <text x="150" y="170" fill="black">PAPI
         <tspan x="150" y="210">REKTD</tspan>
@@ -26,6 +30,31 @@
         <tspan x="150" y="250">NC</tspan>
         <tspan x="150" y="270">FRT</tspan>
         <tspan x="150" y="290">S.R</tspan>
-        <tspan x="150" y="310">FI.RE</tspan>
+        <tspan x="150" y="310">-VVV-</tspan>
+        <tspan x="150" y="330">RECON</tspan>
+    </text>
+
+    <text x="750" y="490" fill="black" font-size="x-small">-SND-: Sentinel Dawn
+        <tspan x="750" y="480">-7-: Sev3rance</tspan>
+        <tspan x="750" y="470">VINDI: Vindictive</tspan>
+        <tspan x="750" y="460">AARP.: Already Replaced</tspan>
+        <tspan x="750" y="450">FEDUP: Federation Uprising</tspan>
+        <tspan x="750" y="440">W4RP: Warped Intentions</tspan>
+        <tspan x="750" y="430">IOU: Evictus.</tspan>
+        <tspan x="750" y="420">REQ: Eternal Requiem</tspan>
+
+        <tspan x="750" y="400">TEST: TEST Alliance Please Ignore</tspan>
+
+        <tspan x="750" y="360">AOM: The Army of Mango Alliance</tspan>
+        <tspan x="750" y="370">FI.RE: FI.RE Coalition</tspan>
+    </text>
+
+    <text x="750" y="10" fill="black" font-size="x-small">REKTD: Pandemic Horde
+        <tspan x="750" y="20">-10.0: Pandemic Legion</tspan>
+        <tspan x="750" y="30">NC: Northern Coalition</tspan>
+        <tspan x="750" y="40">FRT: Fraternity</tspan>
+        <tspan x="750" y="50">S.R: Stellae Renascitur</tspan>
+        <tspan x="750" y="60">-VVV-: VENI VIDI VICI.</tspan>
+        <tspan x="750" y="70">RECON: Reckless Contingency.</tspan>
     </text>
 </svg>
