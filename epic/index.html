@@ -8,11 +8,16 @@
   text-align: center;
   padding-top: 10px;
 }
-h1 { margin-top: 0;}
+h1 { margin-top: 0; margin-bottom: 20px;}
 h1, h2, h3 { padding-bottom: 5px; }
 .mid-sized {
   width: 560px;
   margin: auto;
+}
+.intro {
+  text-align: justify;
+  margin: auto;
+  width: 560px;
 }
 .example, .todos, #output-p2-summary, #output-p4-summary-l, #output-p4-summary-r,
     #output-p3-summary-l-t, #output-p3-summary-l-b, #output-p3-summary-r {
@@ -27,11 +32,18 @@ h1, h2, h3 { padding-bottom: 5px; }
 .bg-grey {
   background-color: #444444;
 }
+.bg-example {
+  background-color: #5a4d32;
+}
 .buttons {
   clear: both;
   padding-top: 10px;
 }
-#single-planets-container, #output-container {
+#single-planets-container {
+  display: none;
+  margin-top: 20px;
+}
+#output-container {
   display: none;
 }
 #single-planets {
@@ -106,53 +118,57 @@ li > ul {
 <body><div class="viewport">
 
 <h1>EVE Planetary Interaction Chart</h1>
-<div>
+<div class="intro">
   <p>
-  When deciding where set up my PI in a constellation I wanted<br>
-  to choose a semi-good setup of what P1 and P2 to setup and<br>
-  minimize shuttling P1 from planet to planet.<br>
-  This tool will recommend what P2/P3 you can produce on a single planet.<br>
+  When deciding where set up my PI in a constellation I wanted
+  to choose a semi-good setup of which specific P1 and P2 to build
+  and to minimize shuttling P1 from planet to planet.<br>
+  This tool will recommend what P2/P3 you can produce on a single planet,
+  and which P3/P4 you can build in a single system.<br>
   </p>
   <p>
   To get the input, go to the Agency window ingame,<br>
-  then Planetary Interaction and write down the percentages.
+  then to "Planetary Interaction" and write down the percentages.
   </p>
 </div>
 
 <div class="mid-sized">
   <h2>Example input notation</h2>
-  <div class="example bg-grey">
+  <div class="example bg-example">
     <p>
     <strong>1G AL 59	IS 57	RG 30	BM 62	NG 66</strong><br>
     <strong>2b al 20 hm 40&#9;bm30</strong><br>
     </p>
+  </div>
+  <hr>
+  <h2>Explanation</h2>
+  <div class="example bg-grey">
     2 = Planet 2<br>
     b = Barren<br>
     20/40/30 = x% according to Agency or scanning<br>
     <div id="mats"></div>
     (everything is case insensitive)
   </div>
-</div>
 
-<div>
+  <hr>
   <h2>Paste your survey here</h2>
   <textarea type="text" class="paste mid-sized" value=""></textarea><br>
   <div class="buttons">
     <input type="button" id="import" value="import" />
   </div>
-  <hr>
 </div>
 
 <div id="single-planets-container">
+  <hr class="mid-sized">
   <h2>Breakdown</h2>
   <div id="single-planets"></div>
   <div class="buttons">
     <input type="button" id="go" value="go" /><br />
   </div>
-  <hr>
 </div>
 
 <div id="output-container">
+  <hr>
   <h2>Results</h2>
   <ul>
     <li><span class="p4-name">P4 components have this color</span></li>
@@ -190,6 +206,8 @@ li > ul {
   <textarea id="output-p2"></textarea>
 </div>
 
+<div class="mid-sized">
+<hr>
 <h2>Changes, TODOs, etc</h2>
 <div class="todos">
 <ul>
@@ -201,11 +219,7 @@ li > ul {
   <li>2021-03-16: revamped layout, added examples</li>
   <li>2020-05: first version</li>
 </ul>
-
-<ul>
-  <li>TODO: clarify P3 output on single planet</li>
-  <li>TODO: allow cross-planet calculations</li>
-</ul>
+</div>
 </div>
 
   </div>
