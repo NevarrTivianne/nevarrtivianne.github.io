@@ -11,11 +11,12 @@
 h1 { margin-top: 0;}
 h1, h2, h3 { padding-bottom: 5px; }
 .mid-sized {
-  width: 460px;
+  width: 560px;
   margin: auto;
 }
-.example, .todos, #output-p2-summary, #output-p3-summary, #output-p3-summary-2 {
-  width: 460px;
+.example, .todos, #output-p2-summary, #output-p4-summary-l, #output-p4-summary-r,
+    #output-p3-summary-l-t, #output-p3-summary-l-b, #output-p3-summary-r {
+  width: 560px;
   text-align: left;
   margin: auto;
   padding: 10px;
@@ -34,13 +35,13 @@ h1, h2, h3 { padding-bottom: 5px; }
   display: none;
 }
 #single-planets {
-  width: 460px;
+  width: 560px;
   margin: auto;
 }
 input[type=text] { width: 300px; }
-input[type=text].p-name { width: 50px; float: left; }
-input[type=text].p-type { width: 70px; float: left; }
-input[type=text].p-search { width: 340px; float: left; }
+input[type=text].p-name { width: 70px; float: left; }
+input[type=text].p-type { width: 100px; float: left; }
+input[type=text].p-search { width: 390px; float: left; }
 
 textarea {
  width: 80%;
@@ -48,10 +49,45 @@ textarea {
  margin: auto;
 }
 .paste {
-  height: 120px;
+  height: 200px;
+  background-color: darkolivegreen;
+}
+.paste-done {
+  height: 200px;
+  background-color: rgb(47, 66, 14);
 }
 #go {
-  background-color: rgb(82, 109, 42);
+  background-color: darkolivegreen;
+}
+.planet-name {
+  background-color: blueviolet;
+  border: #444444 1px solid;
+  padding: 2px;
+  font-size: smaller;
+  text-align: center;
+  width: 45px;
+  display: inline-block
+}
+.p2-name {
+  background-color: rgb(94, 116, 90);
+  border: #444444 1px solid;
+  padding: 2px;
+  line-height: 120%;
+}
+.p3-name {
+  background-color: rgb(26, 104, 117);
+  border: #444444 1px solid;
+  padding: 2px;
+  line-height: 120%;
+}
+.p4-name {
+  background-color: rgb(22, 59, 129);
+  border: #444444 1px solid;
+  padding: 2px;
+  line-height: 120%;
+}
+li > ul {
+  margin-top: 5px;
 }
 </style>
 </head>
@@ -106,16 +142,31 @@ textarea {
 
 <div id="output-container">
   <h2>Results</h2>
+  <ul>
+    <li><span class="p4-name">P4 components have this color</span></li>
+    <li><span class="p3-name">P3 components have this color</span></li>
+    <li><span class="p2-name">P2 components have this color</span></li>
+  </ul>
   <!--<h3>P1</h3>
     <textarea id="output-p1"></textarea>-->
+  <h3>P4 - Summary</h3>
+  <table><tr><td>
+  <div id="output-p4-summary-l"></div>
+  </td><td>
+  <div id="output-p4-summary-r"></div>
+  </td></tr></table>
   <h3>P3 - Summary</h3>
   <table><tr><td>
-  <div id="output-p3-summary"></div>
+  <div id="output-p3-summary-l-t"></div>
+  <hr>
+  <div id="output-p3-summary-l-b"></div>
   </td><td>
-  <div id="output-p3-summary-2"></div>
+  <div id="output-p3-summary-r"></div>
   </td></tr></table>
   <h3>P2 - Summary</h3>
   <div id="output-p2-summary"></div>
+  <h3>P4 - Details</h3>
+  <textarea id="output-p4"></textarea>
   <h3>P3 - Details</h3>
   <textarea id="output-p3"></textarea>
   <h3>P2 - Details</h3>
@@ -149,15 +200,39 @@ var roman = [
 ];
 var planets = [];
 
-function out0(sel, text) {
+function lbl_it(name, cls, prefix) {
+  return '<span class="' + cls + '">' + prefix + name + '</span>';
+}
+
+function lbl_planet(name) {
+  return lbl_it(name, 'planet-name', 'Plt ');
+}
+
+function lbl_p4(name) {
+  return lbl_it(name, 'p4-name', '');
+}
+
+function lbl_p3(name) {
+  return lbl_it(name, 'p3-name', '');
+}
+
+function lbl_p2(name) {
+  return lbl_it(name, 'p2-name', '');
+}
+
+function out0(sel, text, prefix) {
   var old = $(sel).val();
-  $(sel).text(old + text);
+  if (prefix == true) $(sel).text(text + old);
+  else $(sel).text(old + text);
 }
-function out2(text) {
-  out0('#output-p2', text + "\n");
+function out2(text, prefix) {
+  out0('#output-p2', text + "\n", prefix);
 }
-function out3(text) {
-  out0('#output-p3', text + "\n");
+function out3(text, prefix) {
+  out0('#output-p3', text + "\n", prefix);
+}
+function out4(text, prefix) {
+  out0('#output-p4', text + "\n", prefix);
 }
 
 // set up stuff for lookup and data
@@ -275,9 +350,9 @@ p3['Vaccines'] = ['Livestock', 'Viral Agent'];
 
 p4['Broadcast Node'] = ['Neocoms', 'Data Chips', 'High-Tech Transmitters'];
 p4['Integrity Response Drones'] = ['Gel-Matrix Biopaste', 'Hazmat Detection Systems', 'Planetary Vehicles'];
-p4['Nano-Factory'] = ['Industrial Explosives', 'Ukomi Super Conductors', '40 Reactive Metals'];
+p4['Nano-Factory'] = ['Industrial Explosives', 'Ukomi Super Conductor', '40 Reactive Metals'];
 p4['Organic Mortar Applicators'] = ['Condensates', 'Robotics', '40 Bacteria'];
-p4['Recursive Computing Module'] = ['Synthetic Synapses', 'Guidance Systems', 'Transcranial Microcontrollers'];
+p4['Recursive Computing Module'] = ['Synthetic Synapses', 'Guidance Systems', 'Transcranial Microcontroller'];
 p4['Self-Harmonizing Power Core'] = ['Camera Drones', 'Nuclear Reactors', 'Hermetic Membranes'];
 p4['Sterile Conduits'] = ['40 Water', 'Smartfab Units', 'Vaccines'];
 p4['Wetware Mainframe'] = ['Supercomputers', 'Biotech Research Reports', 'Cryoprotectant Solution'];
@@ -317,6 +392,7 @@ $('#import').on('click', function(e){
       $("#single-planets").append(row);
     }
   });
+  $(".paste").addClass("paste-done").removeClass("paste");
   //console.log(planets);
 });
 
@@ -324,11 +400,34 @@ $('#import').on('click', function(e){
 // the actual calculation
 $('#go').on('click', function(e){
   $("#output-p2-summary").empty();
-  $("#output-p3-summary").empty();
-  $("#output-p3-summary-2").empty();
+  $("#output-p3-summary-l-t").empty();
+  $("#output-p3-summary-l-b").empty();
+  $("#output-p3-summary-r").empty();
+  $("#output-p4-summary-l").empty();
+  $("#output-p4-summary-r").empty();
   $("#output-p2").empty();
   $("#output-p3").empty();
+  $("#output-p4").empty();
   $("#output-container").show();
+
+  var sys_match_p1 = {};
+  var sys_match_p2 = {};
+  var inter_p3 = {};
+  var inter_p4 = {};
+  $.each(p1, function(k, v) {
+    sys_match_p1[k] = [];
+  });
+  $.each(p2, function(k, v) {
+    sys_match_p2[k] = [];
+  });
+  $.each(p3, function(k, v) {
+    inter_p3[k] = [];
+  });
+  $.each(p4, function(k, v) {
+    inter_p4[k] = [];
+  });
+
+  //// big ugly per-planet-loop
   for (var ip=0; ip<planets.length; ++ip) {
 
 // read inputs and parse
@@ -373,8 +472,10 @@ $.each(p2, function(k, v) {
       ok.push(k);
     }
   });
-  if (ok.length == 2) match2.push(k);
-  else if (ok.length == 1) match1.push(k);
+  if (ok.length == 2) {
+    match2.push(k);
+    sys_match_p2[k].push({pid:ip, k});
+  } else if (ok.length == 1) match1.push(k);
 });
 
 // show 2/2 P2 and calculate average
@@ -387,7 +488,7 @@ $.each(match2, function(k, v) {
     avg = avg + parseInt(amounts1[v2]);
   });
   out2("Average: " + (avg/2));
-  p2_summary += "<li>" + name + " :: " + "P2 :: " + v + ": " + (avg/2) + "</li>"
+  p2_summary += "<li>" + lbl_planet(name) + " :: " + "P2 :: " + lbl_p2(v) + ": " + (avg/2) + "</li>"
 });
 if (p2_summary != "") {
   $("#output-p2-summary").append("<ul>" + p2_summary + "</ul>");
@@ -419,48 +520,162 @@ $.each(p3, function (k, v) {
 });
 
 // show (unlikely) 2/2 and 3/3 P3 and calculate average
-var p3_summary = "";
+var p3_summary_1 = "";
 $.each(match3, function(k, v) {
-  var line = "P3 (2/2): " + v + " =<br>";
+  var line = lbl_p3(v) + " - P3 (2/2)<br><ul>";
   out3("P3 (2/2): " + v);
+  var tmpx = [];
   $.each(p3[v], function(k2, v2) {
-    out3("  " + v2 + " " );
+    out3(v2);
+    tmpx.push(lbl_p2(v2));
   });
-  line += p3[v].join(" / ");
+  line += "<li>" + tmpx.join(" + ") + " :: " + lbl_planet(name) + "</li></ul>";
   out3("");
-  p3_summary += "<li>" + name + " :: " + line + "" + "</li>";
+  p3_summary_1 += "<li>" + line + "</li>";
 });
 
 // show 1/2 P3
 if (match3_m.length > 0 && match3.length > 0) out3("\-------\n");
-//if (match3_m.length > 0 && match3.length > 0) $("#output-p3-summary").append("<ul>");
 var p3_summary_2 = "";
-console.log(match3_m);
 $.each(match3_m, function(k, v) {
-  var line = "P3 (1/x): " + v + " =<br>";
+  var line = lbl_p3(v) + " - P3 (1/x)<br><ul>";
   out3("P3 (1/x): " + v);
-  //console.log(name, v, match2);
+  var tmpx = [];
   $.each(p3[v], function(k2, v2) {
-    //console.log("x " + k2 + " " + v2);
     if ($.inArray(v2, match2) > 0) {
       out3("  " + v2 + " :: 1");
-      line += " " + v2;
+      tmpx.push(lbl_p2(v2));
     } else {
       out3("  " + v2 + " :: 0");
     }
   });
-  //$("#output-p3-summary").append("<li>" + name + " :: " + line + "" + "</li>");
-  p3_summary_2 = "<li>" + name + " :: " + line + "" + "</li>";
+  line += "<li>" + tmpx.join(" + ") +" :: " + lbl_planet(name) + "</li></ul>";
+  p3_summary_2 = "<li>" + line + "" + "</li>";
 });
-//if (match3.length > 0) $("#output-p3-summary").append("</ul>");
-if (p3_summary != "") {
-  $("#output-p3-summary").append("<ul>" + p3_summary + "</ul>");
+if (p3_summary_1 != "") {
+  $("#output-p3-summary-l-t").append("<ul>" + p3_summary_1 + "</ul>");
 }
 if (p3_summary_2 != "") {
-  $("#output-p3-summary-2").append("<ul>" + p3_summary_2 + "</ul>");
+  $("#output-p3-summary-l-b").append("<ul>" + p3_summary_2 + "</ul>");
 }
 
+  } // end per-planet-loop
+
+  // calculate interplanetary P3
+  $.each(p3, function (p3_name, v) {
+    var ok = [];
+    $.each(p3[p3_name], function(_k2, p2_name) {
+      if (sys_match_p2[p2_name].length > 0) {
+        ok.push({p3: p3_name, val: sys_match_p2[p2_name]});
+      }
+    });
+    // these are the P3 products with 2 components
+    if (ok.length == 2 && ok.length == p3[p3_name].length) {
+      //out3("xxx2 " + p3_name, true);
+      for(var i=0;i<ok.length;++i) {
+        for(var j=0;j<ok.length;++j) {
+          if (i == j) continue;
+          //console.log(ok[i]);
+          for(var m=0;m<ok[i].val.length;++m) {
+            for(var n=0;n<ok[j].val.length;++n) {
+
+              //console.log(ok[i].val[m], ok[j].val[n]);
+              var mm = ok[i].val[m];
+              var nn = ok[j].val[n];
+              if (mm.k > nn.k) continue;
+              //console.log("y Planet " + planets[mm.pid].name + "(" + mm.k + ")" , ok[j].val[n]);
+              //out3("y Planet " + planets[mm.pid].name + "(" + mm.k + "), Planet " + planets[nn.pid].name + "(" +  nn.k, true);
+              inter_p3[p3_name].push([planets[mm.pid], mm.k, planets[nn.pid], nn.k]);
+            }
+          }
+        }
+      }
+
+    } else if (ok.length == 3 && ok.length == p3[p3_name].length) {
+      // these are the P3 products with 3 components
+      //out3("xxx3 " + p3_name, true);
+      for(var i=0;i<ok.length;++i) {
+        for(var j=0;j<ok.length;++j) {
+          for(var z=0;z<ok.length;++z) {
+            if (i == j || i == z || j == z) continue;
+            for(var m=0;m<ok[i].val.length;++m) {
+              for(var n=0;n<ok[j].val.length;++n) {
+                for(var o=0;o<ok[z].val.length;++o) {
+                  var mm = ok[i].val[m];
+                  var nn = ok[j].val[n];
+                  var oo = ok[z].val[o];
+                  if (mm.k > nn.k || mm.k > oo.k || nn.k > oo.k) continue;
+                  inter_p3[p3_name].push([planets[mm.pid], mm.k, planets[nn.pid], nn.k, planets[oo.pid], oo.k]);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+  var tmp = "========== Interplanetary P3 ==========\n";
+  console.log(inter_p3);
+  var p3i_summary = "";
+  $.each(inter_p3, function(p3_name, v) {
+    if (v.length < 1) return;
+    tmp += "\nP3: " + p3_name + "\n";
+    p3i_summary += "<li><span class='p3-name'>" + p3_name + "</span>\n<ul>";
+    for(var i=0;i<v.length;++i) {
+      if (v[i].length == 4 || v[i].length == 6) {
+        tmp += "  " + v[i][1] + " (Planet " + v[i][0].name + ")";
+        tmp += " + " + v[i][3] + " (Planet " + v[i][2].name + ")";
+        p3i_summary += "<li>" + lbl_p2(v[i][1]) + " " + lbl_planet(v[i][0].name);
+        p3i_summary += " + " + lbl_p2(v[i][3]) + " " + lbl_planet(v[i][2].name);
+        if (v[i].length == 6) {
+          tmp += " + " + v[i][5] + " (Planet " + v[i][4].name + ")";
+          p3i_summary += " + " + lbl_p2(v[i][5]) + " " + lbl_planet(v[i][4].name);
+        }
+        tmp += "\n";
+        p3i_summary += "</li>\n";
+      }
+    }
+    p3i_summary += "</ul></li>\n"
+  });
+  out3(tmp, true);
+  if (p3i_summary != "") {
+    $("#output-p3-summary-r").append("<ul>" + p3i_summary + "</ul>");
   }
+
+  // calculate interplanetary P4
+  $.each(p4, function (p4_name, v) {
+    var ok = [];
+    $.each(p4[p4_name], function(_k3, p3_name) {
+
+      let re = new RegExp("(\\d+)\\s(\\w[\\w\\s]+)");
+      let found = p3_name.match(re);
+      console.debug(",,", p4_name, p3_name, found);
+      var okx = {p4: p4_name, p3: [], p1:[]};
+      if (found && found.length > 1) {
+        okx.p1.push(found[1]);
+      } else if (inter_p3[p3_name].length > 0) {
+        okx.p3.push(inter_p3[p3_name]);
+      }
+      ok.push(okx);
+      okx.p1 = [];
+      okx.p3 = [];
+      console.log(ok);
+      if (ok.length == p4[p4_name].length) {
+        var x = p4_name + "(";
+        var xx = lbl_p4(p4_name) + "(";
+        $.each(p4[p4_name], function(k, v) {
+          x += v + " ";
+          xx += lbl_p3(v) + " ";
+        });
+        x += ")";
+        xx += ")<br>";
+        console.debug("!! P4 ", p4_name, ok);
+        out4(x);
+        $("#output-p4-summary-l").append("<ul>" + xx + "</ul>");
+      }
+    });
+  });
+
 });
 </script>
 </body></html>
