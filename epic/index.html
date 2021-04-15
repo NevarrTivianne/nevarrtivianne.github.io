@@ -86,6 +86,18 @@ textarea {
   padding: 2px;
   line-height: 120%;
 }
+.p3-nope {
+  background-color: rgb(77, 20, 20);
+  border: #444444 1px solid;
+  padding: 2px;
+  line-height: 120%;
+}
+.p1-name {
+  background-color: rgb(9, 104, 17);
+  border: #444444 1px solid;
+  padding: 2px;
+  line-height: 120%;
+}
 li > ul {
   margin-top: 5px;
 }
@@ -146,21 +158,26 @@ li > ul {
     <li><span class="p4-name">P4 components have this color</span></li>
     <li><span class="p3-name">P3 components have this color</span></li>
     <li><span class="p2-name">P2 components have this color</span></li>
+    <li><span class="p1-name">P1 components have this color</span></li>
   </ul>
   <!--<h3>P1</h3>
     <textarea id="output-p1"></textarea>-->
   <h3>P4 - Summary</h3>
   <table><tr><td>
+    <h4>Complete</h4>
   <div id="output-p4-summary-l"></div>
   </td><td>
+    <h4>Partial</h4>
   <div id="output-p4-summary-r"></div>
   </td></tr></table>
   <h3>P3 - Summary</h3>
   <table><tr><td>
+    <h4>Single Planet</h4>
   <div id="output-p3-summary-l-t"></div>
   <hr>
   <div id="output-p3-summary-l-b"></div>
   </td><td>
+    <h4>Per System</h4>
   <div id="output-p3-summary-r"></div>
   </td></tr></table>
   <h3>P2 - Summary</h3>
@@ -176,6 +193,7 @@ li > ul {
 <h2>Changes, TODOs, etc</h2>
 <div class="todos">
 <ul>
+  <li>2021-04-15: added P3+P4 across planets</li>
   <li>2021-04-02: added summary for P2/P3</li>
   <li>2021-03-21: added shortcut explanation</li>
   <li>2021-03-18: new CSS, some layout changes, split P2/P3</li>
@@ -203,21 +221,20 @@ var planets = [];
 function lbl_it(name, cls, prefix) {
   return '<span class="' + cls + '">' + prefix + name + '</span>';
 }
-
 function lbl_planet(name) {
   return lbl_it(name, 'planet-name', 'Plt ');
 }
-
 function lbl_p4(name) {
   return lbl_it(name, 'p4-name', '');
 }
-
 function lbl_p3(name) {
   return lbl_it(name, 'p3-name', '');
 }
-
 function lbl_p2(name) {
   return lbl_it(name, 'p2-name', '');
+}
+function lbl_p1(name) {
+  return lbl_it(name, 'p1-name', '');
 }
 
 function out0(sel, text, prefix) {
@@ -392,7 +409,7 @@ $('#import').on('click', function(e){
       $("#single-planets").append(row);
     }
   });
-  $(".paste").addClass("paste-done").removeClass("paste");
+  $(".paste").addClass("paste-done");
   //console.log(planets);
 });
 
@@ -412,6 +429,7 @@ $('#go').on('click', function(e){
 
   var sys_match_p1 = {};
   var sys_match_p2 = {};
+  var solo_p3 = {};
   var inter_p3 = {};
   var inter_p4 = {};
   $.each(p1, function(k, v) {
@@ -422,6 +440,7 @@ $('#go').on('click', function(e){
   });
   $.each(p3, function(k, v) {
     inter_p3[k] = [];
+    solo_p3[k] = [];
   });
   $.each(p4, function(k, v) {
     inter_p4[k] = [];
@@ -532,6 +551,7 @@ $.each(match3, function(k, v) {
   line += "<li>" + tmpx.join(" + ") + " :: " + lbl_planet(name) + "</li></ul>";
   out3("");
   p3_summary_1 += "<li>" + line + "</li>";
+  solo_p3[v].push(planets[ip]);
 });
 
 // show 1/2 P3
@@ -644,36 +664,64 @@ if (p3_summary_2 != "") {
 
   // calculate interplanetary P4
   $.each(p4, function (p4_name, v) {
-    var ok = [];
+    var okx = {p4: p4_name, p3: [], p1:[]};
     $.each(p4[p4_name], function(_k3, p3_name) {
-
       let re = new RegExp("(\\d+)\\s(\\w[\\w\\s]+)");
       let found = p3_name.match(re);
-      console.debug(",,", p4_name, p3_name, found);
-      var okx = {p4: p4_name, p3: [], p1:[]};
+      console.debug(",,", p4_name, " :: ", p3_name, " :: ", found);
+
       if (found && found.length > 1) {
-        okx.p1.push(found[1]);
+        okx.p1.push([p3_name, found[1], found[2]]);
       } else if (inter_p3[p3_name].length > 0) {
-        okx.p3.push(inter_p3[p3_name]);
-      }
-      ok.push(okx);
-      okx.p1 = [];
-      okx.p3 = [];
-      console.log(ok);
-      if (ok.length == p4[p4_name].length) {
-        var x = p4_name + "(";
-        var xx = lbl_p4(p4_name) + "(";
-        $.each(p4[p4_name], function(k, v) {
-          x += v + " ";
-          xx += lbl_p3(v) + " ";
-        });
-        x += ")";
-        xx += ")<br>";
-        console.debug("!! P4 ", p4_name, ok);
-        out4(x);
-        $("#output-p4-summary-l").append("<ul>" + xx + "</ul>");
+        okx.p3.push({n:p3_name,val:inter_p3[p3_name]});
+      } else if (solo_p3[p3_name].length > 0) {
+        console.debug("aaa ", solo_p3[p3_name]);
+        okx.p3.append({n:p3_name,val:solo_p3[p3_name]});
       }
     });
+    console.log("okx", okx);
+    if (okx.p3.length + okx.p1.length == p4[p4_name].length) {
+      var xo = "P4: " + p4_name + "\n";
+      var xx = "<li>" +lbl_p4(p4_name) + "<ul>";
+      $.each(p4[p4_name], function(k, v) {
+        xo += "  +" + v + "\n";
+        if (okx.p1.length > 0 && v == okx.p1[0][0]) {
+          xx += "<li>" + lbl_p1(v) + "</li>";
+        } else xx += "<li>" + lbl_p3(v) + "</li>";
+      });
+      xx += "</li></ul></li>";
+      console.debug("!! P4 ", p4_name, okx);
+      out4(xo);
+      $("#output-p4-summary-l").append("<ul>" + xx + "</ul>");
+    } else if (okx.p3.length > 0) {
+      console.debug("!!! P4 ", p4_name, p4[p4_name].length, okx.p3.length, okx.p1.length);
+      var xx = "<li>" + lbl_p4(p4_name) + "<ul>";
+      var xo = "P4: " + p4_name + "\n";
+      var p3k = [];
+      okx.p3.forEach(function(kk) {
+        p3k.push(kk.n);
+      });
+      p4[p4_name].forEach(function (cur) {
+        xx += "<li>";
+        if (p3k.indexOf(cur) >= 0) {
+            xx += lbl_it(cur, 'p3-name', '');
+            xo += "  +" + cur + "\n";
+        } else if (okx.p1.length > 0 && cur == okx.p1[0][0]) {
+            xx += lbl_it(cur, 'p1-name', '');
+            xo += "  +" + cur + "\n";
+        } else {
+          xx += lbl_it(cur, 'p3-nope', '');
+          xo += "  -" + cur + "\n";
+        }
+        xx += "</li>";
+      });
+      xx += "</ul></li>";
+      out4(xo);
+      $("#output-p4-summary-r").append("<ul>" + xx + "</ul>");
+    } else {
+      var xx = "<li>" + lbl_p4(p4_name) + "</li>";
+      $("#output-p4-summary-r").append("<ul>" + xx + "</ul>");
+    }
   });
 
 });
