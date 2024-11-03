@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>EVE system lookup</title>
+<link rel="stylesheet" href="../assets/awsm_theme_black.min.css">
+<meta charset="utf-8"/>
+<style>
+.viewport {
+  text-align: center;
+  padding-top: 10px;
+}
+h1 { margin-top: 0; margin-bottom: 20px;}
+h1, h2, h3 { padding-bottom: 5px; }
+.mid-sized {
+  width: 560px;
+  margin: auto;
+}
+.intro {
+  text-align: justify;
+  margin: auto;
+  width: 560px;
+}
+.bg-grey {
+  background-color: #444444;
+}
+.bg-example {
+  background-color: #5a4d32;
+}
+#changes {
+  display: none;
+}
+#single-planets-container {
+  display: none;
+  margin-top: 20px;
+}
+#single-planets {
+  width: 560px;
+  margin: auto;
+  text-align: left;
+  padding-top: 20px;
+}
+input[type=text] { width: 300px; float: left}
+
+#paste2 {
+  background-color: darkolivegreen;
+  float: center;
+}
+.paste2-done {
+  background-color: rgb(47, 66, 14);
+}
+#go {
+  background-color: darkolivegreen;
+}
+</style>
+</head>
+<body><div class="viewport">
+
+<h1>EVE system lookup</h1>
+<div class="intro">
+</div>
+
+<div class="mid-sized">
+  <hr>
+  <!--<h2>Paste here</h2>-->
+  <div>
+  <input type="text" id="paste2" placeholder="Jita">
+  <input type="button" id="search" value="search" class="p-search" />
+  </div>
+</div>
+
+<div id="single-planets-container">
+  <hr class="mid-sized">
+  <!--<h2>Results</h2>-->
+  <div id="single-planets"></div>
+</div>
+
+<div id="changes" class="mid-sized">
+<hr>
+<h2>Changes, TODOs, etc</h2>
+<div class="todos">
+<ul>
+  <li>2024-11-03: first version</li>
+</ul>
+</div>
+</div>
+
+  </div>
+<script src="./systems.js"></script>
+<script type="text/javascript">
+var systems2 = {};
+Object.keys(systems).forEach((cur) => {
+  var nk1 = cur.toLowerCase();
+  var nk2 = nk1.replace(' ', '').replace('-', '');
+  systems2[nk1] = {n: cur, c: systems[cur].c, r: systems[cur].r,t:"s"};
+  systems2[nk2] = {n: cur, c: systems[cur].c, r: systems[cur].r,t:"s"};
+
+  var nkc1 = systems[cur].c.toLowerCase();
+  var nkc2 = nkc1.replace(' ', '').replace('-', '');
+  systems2[nkc1] = {n: systems[cur].c, c: systems[cur].c, r: systems[cur].r, t: "c"};
+  systems2[nkc2] = {n: systems[cur].c, c: systems[cur].c, r: systems[cur].r, t: "c"};
+
+  var nkr1 = systems[cur].r.toLowerCase();
+  var nkr2 = nkr1.replace(' ', '').replace('-', '');
+  systems2[nkr1] = {n: systems[cur].r, c: systems[cur].r, r: systems[cur].r, t: "r"};
+  systems2[nkr2] = {n: systems[cur].r, c: systems[cur].r, r: systems[cur].r, t: "r"};
+});
+systems = {};
+
+function dl(s) {
+  return s.replace(' ', '_');
+}
+
+function add(sys, o) {
+    //console.log(sys, o);
+    var rv = 'https://evemaps.dotlan.net/map/' + dl(sys.r) + '/' + sys.n + '#sec';
+    if (sys.t == "s") {
+      var nl = document.createElement('a');
+      nl.setAttribute('href', rv);
+      nl.appendChild(document.createTextNode(sys.n));
+      o.appendChild(nl);
+      o.appendChild(document.createTextNode(" < "));
+    }
+
+    if (sys.t == "s" || sys.t == "c") {
+      var nl2 = document.createElement('a');
+      nl2.setAttribute('href', 'https://evemaps.dotlan.net/map/' + dl(sys.r) + '/' + sys.c + '#sec');
+      nl2.appendChild(document.createTextNode(sys.c));
+      o.appendChild(nl2);
+      o.appendChild(document.createTextNode(" < "));
+    }
+
+    var nl3 = document.createElement('a');
+    nl3.setAttribute('href', 'https://evemaps.dotlan.net/map/' + dl(sys.r) + '/#sec');
+    var tr = sys.r;
+    nl3.appendChild(document.createTextNode(tr));
+    o.appendChild(nl3);
+    if (sys.t == "c") { o.appendChild(document.createTextNode(" [constellation]")); }
+    if (sys.t == "r") { o.appendChild(document.createTextNode(" [region]")); }
+    return [sys.n, rv];
+}
+
+function lookup(name) {
+  name = name.toLowerCase();
+  var oc = document.getElementById('single-planets-container');
+  var o = document.getElementById('single-planets');
+  o.innerHTML = "";
+  oc.style.display = 'block';
+  console.log("LOOKUP1[" + name + "]", o);
+  if (Object.hasOwn(systems2, name.toLowerCase())) {
+    console.log("LOOKUP2[" + name + "]");
+    var sys = systems2[name];
+    var rv = add(sys, o);
+    window.location.hash = name;
+    window.location.href = rv[1];
+  } else {
+    console.log("LOOKUP3[" + name + "]");
+    var done = {};
+    Object.keys(systems2).forEach((sys) => {
+      if (name.length > 1 && sys.startsWith(name.toLowerCase())) {
+        var sys2 = systems2[sys];
+        console.log(sys2);
+        if (!Object.keys(done).includes(sys2.n)) {
+          var rv = add(sys2, o);
+          window.location.hash = name;
+          done[rv[0]] = 1;
+	}
+      }
+    });
+  }
+}
+
+var hash = window.location.hash;
+if (hash.length > 1) {
+  var pf = document.getElementById('paste2');
+  pf.value = hash.substr(1);
+  lookup(pf.value);
+}
+
+document.getElementById('search').addEventListener('click', (ev) => {
+  var pasted = document.getElementById('paste2').value;
+  lookup(pasted);
+});
+document.getElementById('paste2').addEventListener('keypress', (ev) => {
+  if (ev.keyCode == 13) {
+    lookup(ev.srcElement.value);
+  }
+});
+document.getElementById('paste2').addEventListener('focus', (ev) => {
+  ev.srcElement.select();
+});
+
+window.onload = function() {
+  document.getElementById('paste2').focus();
+}
+
+</script>
+</body></html>
