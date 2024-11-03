@@ -2,7 +2,7 @@
 <html lang="en"><head>
 <title>EVE system lookup</title>
 <link rel="stylesheet" href="../assets/awsm_theme_black.min.css">
-<meta charset="utf-8"/>
+<meta charset="utf-8">
 <style>
 .viewport {
   text-align: center;
@@ -42,7 +42,6 @@ input[type=text] { width: 300px; float: left}
 
 #paste2 {
   background-color: darkolivegreen;
-  float: center;
 }
 .paste2-done {
   background-color: rgb(47, 66, 14);
@@ -63,7 +62,7 @@ input[type=text] { width: 300px; float: left}
   <!--<h2>Paste here</h2>-->
   <div>
   <input type="text" id="paste2" placeholder="Jita">
-  <input type="button" id="search" value="search" class="p-search" />
+  <input type="button" id="search" value="search">
   </div>
 </div>
 
@@ -85,7 +84,7 @@ input[type=text] { width: 300px; float: left}
 
   </div>
 <script src="./systems.js"></script>
-<script type="text/javascript">
+<script>
 var systems2 = {};
 Object.keys(systems).forEach((cur) => {
   var nk1 = cur.toLowerCase();
@@ -130,11 +129,11 @@ function add(sys, o) {
 
     var nl3 = document.createElement('a');
     nl3.setAttribute('href', 'https://evemaps.dotlan.net/map/' + dl(sys.r) + '/#sec');
-    var tr = sys.r;
-    nl3.appendChild(document.createTextNode(tr));
+    nl3.appendChild(document.createTextNode(sys.r));
     o.appendChild(nl3);
     if (sys.t == "c") { o.appendChild(document.createTextNode(" [constellation]")); }
     if (sys.t == "r") { o.appendChild(document.createTextNode(" [region]")); }
+    o.appendChild(document.createElement('br'));
     return [sys.n, rv];
 }
 
@@ -144,20 +143,18 @@ function lookup(name) {
   var o = document.getElementById('single-planets');
   o.innerHTML = "";
   oc.style.display = 'block';
-  console.log("LOOKUP1[" + name + "]", o);
   if (Object.hasOwn(systems2, name.toLowerCase())) {
-    console.log("LOOKUP2[" + name + "]");
+    //console.debug("LOOKUP2[" + name + "]");
     var sys = systems2[name];
     var rv = add(sys, o);
     window.location.hash = name;
     window.location.href = rv[1];
   } else {
-    console.log("LOOKUP3[" + name + "]");
+    //console.debug("LOOKUP3[" + name + "]");
     var done = {};
     Object.keys(systems2).forEach((sys) => {
       if (name.length > 1 && sys.startsWith(name.toLowerCase())) {
         var sys2 = systems2[sys];
-        console.log(sys2);
         if (!Object.keys(done).includes(sys2.n)) {
           var rv = add(sys2, o);
           window.location.hash = name;
@@ -169,7 +166,14 @@ function lookup(name) {
 }
 
 var hash = window.location.hash;
-if (hash.length > 1) {
+var sear = window.location.search;
+if (sear.length > 4) {
+  const params = new URLSearchParams(sear);
+  sear = params.get('search');
+  if (sear.length > 1) {
+    lookup(sear);
+  }
+} else if (hash.length > 1) {
   var pf = document.getElementById('paste2');
   pf.value = hash.substr(1);
   lookup(pf.value);
@@ -191,6 +195,5 @@ document.getElementById('paste2').addEventListener('focus', (ev) => {
 window.onload = function() {
   document.getElementById('paste2').focus();
 }
-
 </script>
 </body></html>
