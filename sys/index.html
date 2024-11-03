@@ -85,24 +85,27 @@ input[type=text] { width: 300px; float: left}
   </div>
 <script src="./systems.js"></script>
 <script>
+//const start = Date.now();
 var systems2 = {};
 Object.keys(systems).forEach((cur) => {
   var nk1 = cur.toLowerCase();
   var nk2 = nk1.replace(' ', '').replace('-', '');
-  systems2[nk1] = {n: cur, c: systems[cur].c, r: systems[cur].r,t:"s"};
-  systems2[nk2] = {n: cur, c: systems[cur].c, r: systems[cur].r,t:"s"};
+  systems2[nk1] = {n: cur, t:"s"}; Object.assign(systems2[nk1], systems[cur]);
+  systems2[nk2] = {n: cur, t:"s"}; Object.assign(systems2[nk2], systems[cur]);
 
   var nkc1 = systems[cur].c.toLowerCase();
   var nkc2 = nkc1.replace(' ', '').replace('-', '');
-  systems2[nkc1] = {n: systems[cur].c, c: systems[cur].c, r: systems[cur].r, t: "c"};
-  systems2[nkc2] = {n: systems[cur].c, c: systems[cur].c, r: systems[cur].r, t: "c"};
+  systems2[nkc1] = {n: systems[cur].c, t: "c"}; Object.assign(systems2[nkc1], systems[cur]);
+  systems2[nkc2] = {n: systems[cur].c, t: "c"}; Object.assign(systems2[nkc1], systems[cur]);
 
   var nkr1 = systems[cur].r.toLowerCase();
   var nkr2 = nkr1.replace(' ', '').replace('-', '');
-  systems2[nkr1] = {n: systems[cur].r, c: systems[cur].r, r: systems[cur].r, t: "r"};
-  systems2[nkr2] = {n: systems[cur].r, c: systems[cur].r, r: systems[cur].r, t: "r"};
+  systems2[nkr1] = {n: systems[cur].r, t: "r"}; Object.assign(systems2[nkr1], systems[cur]);
+  systems2[nkr2] = {n: systems[cur].r, t: "r"}; Object.assign(systems2[nkr1], systems[cur]);
 });
 systems = {};
+//const end = Date.now();
+//console.debug(`Execution time: ${end - start} ms`);
 
 function dl(s) {
   return s.replace(' ', '_');
@@ -133,6 +136,28 @@ function add(sys, o) {
     o.appendChild(nl3);
     if (sys.t == "c") { o.appendChild(document.createTextNode(" [constellation]")); }
     if (sys.t == "r") { o.appendChild(document.createTextNode(" [region]")); }
+    o.appendChild(document.createTextNode(" (zk: "));
+    if (sys.t == "s") {
+      var nlzs = document.createElement('a');
+      nlzs.setAttribute('href', 'https://zkillboard.com/system/' + sys.sid);
+      nlzs.appendChild(document.createTextNode("s"));
+      o.appendChild(nlzs);
+    }
+    if (sys.t == "c" || sys.t == "s") {
+      o.appendChild(document.createTextNode(" "));
+      var nlzc = document.createElement('a');
+      nlzc.setAttribute('href', 'https://zkillboard.com/constellation/' + sys.cid);
+      nlzc.appendChild(document.createTextNode("c"));
+      o.appendChild(nlzc);
+    }
+    if (true) {
+      o.appendChild(document.createTextNode(" "));
+      var nlzr = document.createElement('a');
+      nlzr.setAttribute('href', 'https://zkillboard.com/region/' + sys.rid);
+      nlzr.appendChild(document.createTextNode("t"));
+      o.appendChild(nlzr);
+    }
+    o.appendChild(document.createTextNode(" )"));
     o.appendChild(document.createElement('br'));
     return [sys.n, rv];
 }
